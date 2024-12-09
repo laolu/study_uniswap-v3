@@ -1,35 +1,23 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0;
 
-import '../interfaces/IERC20.sol';
+import '../interfaces/IERC20Minimal.sol';
 
+/// @title TransferHelper
+/// @notice Contains helper methods for interacting with ERC20 tokens that do not consistently return true/false
 library TransferHelper {
-    // 安全的 transfer 函数
+    /// @notice Transfers tokens from msg.sender to a recipient
+    /// @dev Calls transfer on token contract, errors with TF if transfer fails
+    /// @param token The contract address of the token which will be transferred
+    /// @param to The recipient of the transfer
+    /// @param value The value of the transfer
     function safeTransfer(
         address token,
         address to,
         uint256 value
     ) internal {
-        // 调用 ERC20 的 transfer 函数
         (bool success, bytes memory data) =
-            token.call(abi.encodeWithSelector(IERC20.transfer.selector, to, value));
-            
-        // 检查调用是否成功
+            token.call(abi.encodeWithSelector(IERC20Minimal.transfer.selector, to, value));
         require(success && (data.length == 0 || abi.decode(data, (bool))), 'TF');
     }
-
-    // 安全的 transferFrom 函数
-    function safeTransferFrom(
-        address token,
-        address from,
-        address to,
-        uint256 value
-    ) internal {
-        // 调用 ERC20 的 transferFrom 函数
-        (bool success, bytes memory data) =
-            token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, value));
-            
-        // 检查调用是否成功
-        require(success && (data.length == 0 || abi.decode(data, (bool))), 'TF');
-    }
-} 
+}
